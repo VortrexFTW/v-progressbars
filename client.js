@@ -7,12 +7,15 @@ class ProgressBar {
 		this.name = name;
 	}
 
-	update(name, duration, position, size, foregroundColours, backgroundColours) {
+	update(name, duration, position, size, foregroundColour, backgroundColour) {
+		position = (position instanceof Vec2) ? position : new Vec2(position[0], position[1]);
+		size = (size instanceof Vec2) ? size : new Vec2(size[0], size[1]);
+
 		this.name = name;
 		this.position = new Vec2(position.x/100, position.y/100);
-		this.size = (size instanceof Vec2) ? size : parseSize(size);
-		this.foregroundColour = foregroundColours;
-		this.backgroundColour = backgroundColours;
+		this.size = new Vec2(size.x/100, size.y/100);
+		this.foregroundColour = foregroundColour;
+		this.backgroundColour = backgroundColour;
 		this.duration = duration;
 		this.startTick = 0;
 		this.percent = 0;
@@ -43,19 +46,26 @@ class ProgressBar {
 				this.percent = Math.ceil(currentTick * 100 / this.duration);
 			}
 
-			let width = Math.ceil((this.size.x / 100) * this.percent);
+			
 
 			let zeroPosition = new Vec2(0, 0);
 			let screenWidth = new Vec2(game.width, 0.0);
 			let screenHeight = new Vec2(0.0, game.height);
-			
-			let x = new Vec2(zeroPosition.x + (screenWidth.x - zeroPosition.x) * this.position.x, zeroPosition.y + (screenWidth.y - zeroPosition.y) * this.position.x);
-			let y = new Vec2(zeroPosition.y + (screenHeight.y - zeroPosition.y) * this.position.y, zeroPosition.y + (screenHeight.y - zeroPosition.y) * this.position.y);
 
-			let position = new Vec2(x.x, y.y);
+			let size = new Vec2(
+				new Vec2(zeroPosition.x + (screenWidth.x - zeroPosition.x) * this.size.x, zeroPosition.y + (screenWidth.y - zeroPosition.y) * this.size.x).x,
+				new Vec2(zeroPosition.y + (screenHeight.y - zeroPosition.y) * this.size.y, zeroPosition.y + (screenHeight.y - zeroPosition.y) * this.size.y).y
+			);
 
-			graphics.drawRectangle(null, [position.x - (this.size.x / 2), position.y - (this.size.y / 2) - 1], [this.size.x, this.size.y], this.backgroundColour, this.backgroundColour, this.backgroundColour, this.backgroundColour);
-			graphics.drawRectangle(null, [position.x - (this.size.x / 2), position.y - (this.size.y / 2) - 2], [width, this.size.y], this.foregroundColour, this.foregroundColour, this.foregroundColour, this.foregroundColour);
+			let position = new Vec2(
+				new Vec2(zeroPosition.x + (screenWidth.x - zeroPosition.x) * this.position.x, zeroPosition.y + (screenWidth.y - zeroPosition.y) * this.position.x).x,
+				new Vec2(zeroPosition.y + (screenHeight.y - zeroPosition.y) * this.position.y, zeroPosition.y + (screenHeight.y - zeroPosition.y) * this.position.y).y
+			);
+
+			let width = Math.ceil((size.x / 100) * this.percent);
+
+			graphics.drawRectangle(null, [position.x - (size.x / 2), position.y - (size.y / 2) - 1], [size.x, size.y], this.backgroundColour, this.backgroundColour, this.backgroundColour, this.backgroundColour);
+			graphics.drawRectangle(null, [position.x - (size.x / 2), position.y - (size.y / 2) - 2], [width, size.y], this.foregroundColour, this.foregroundColour, this.foregroundColour, this.foregroundColour);
 		}
 	}
 }
@@ -78,8 +88,8 @@ addEventHandler("OnDrawnHUD", (event) => {
 
 // ===========================================================================
 
-addNetworkHandler("v.progressBar.create", (name, duration, position, size, foregroundColours, backgroundColours) => {
-	create(name, duration, position, size, foregroundColours, backgroundColours)
+addNetworkHandler("v.progressBar.create", (name, duration, position, size, foregroundColour, backgroundColour) => {
+	create(name, duration, position, size, foregroundColour, backgroundColour)
 });
 
 // ===========================================================================
@@ -96,9 +106,9 @@ addNetworkHandler("v.progressBar.percent", (name, percent) => {
 
 // ===========================================================================
 
-function create(name, duration, position, size, foregroundColours, backgroundColours) {
+function create(name, duration, position, size, foregroundColour, backgroundColour) {
 	let progressBar = new ProgressBar(name);
-	progressBar.update(name, duration, position, size, foregroundColours, backgroundColours);
+	progressBar.update(name, duration, position, size, foregroundColour, backgroundColour);
 	progressBars.push(progressBar);
 	progressBar.start();
 	console.log(`${thisResource.name}: Created progress bar ${name}`);
