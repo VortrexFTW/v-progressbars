@@ -5,6 +5,14 @@
 class ProgressBar {
 	constructor(name) {
 		this.name = name;
+
+		this.position = new Vec2(0.0, 0.0);
+		this.size = new Vec2(0.0, 0.0);
+		this.foregroundColour = 0;
+		this.backgroundColour = 0;
+		this.duration = 0;
+		this.startTick = 0;
+		this.percent = 0;
 	}
 
 	update(name, duration, position, size, foregroundColour, backgroundColour) {
@@ -45,8 +53,6 @@ class ProgressBar {
 				let currentTick = sdl.ticks - this.startTick;
 				this.percent = Math.ceil(currentTick * 100 / this.duration);
 			}
-
-			
 
 			let zeroPosition = new Vec2(0, 0);
 			let screenWidth = new Vec2(game.width, 0.0);
