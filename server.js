@@ -1,3 +1,7 @@
+"use strict";
+
+// ===========================================================================
+
 exportFunction("create", create);
 exportFunction("destroy", destroy);
 exportFunction("percent", destroy);
@@ -19,3 +23,5 @@ function destroy(client, name) {
 function percent(client, name, percent) {
 	triggerNetworkEvent("v.progressBar.percent", client, name, percent);
 }
+
+// ===========================================================================
